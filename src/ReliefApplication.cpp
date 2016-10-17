@@ -82,12 +82,6 @@ void ReliefApplication::setup(){
     
     transitionLengthMS = 500; // milliseconds of transition between shape objects
     
-    // set our current shape object to a default shape object
-    //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
-    
-    // and default math equation
-    //UITriggers::buttonTrigger(uiHandler->getButton("equationSelectButton1"));
-    
     setMode("math");
     currentTransitionFromShape = currentShape;
     currentTransitionToShape = currentShape;
@@ -104,8 +98,10 @@ void ReliefApplication::update(){
     if (kinectTracker.timeSinceLastActive() > KINECT_ACTIVITY_TIMEOUT_SEC && currentMode == "telepresence") {
         setMode("math");
     }
-    else if (kinectTracker.timeSinceLastActive() <= KINECT_ACTIVITY_TIMEOUT_SEC && currentMode == "math") {
-        setMode("telepresence");
+    else if (currentMode == "math") {
+        if(kinectTracker.timeSinceLastActive() <= KINECT_ACTIVITY_TIMEOUT_SEC) {
+            setMode("telepresence");
+        }
         //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
     }
     
@@ -436,7 +432,7 @@ void ReliefApplication::keyPressed(int key){
             //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
             break;
         case 'w': // set mode to fixed math (without switching to telepresence)
-            setMode("fixedmath");
+            setMode("math");
             //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
             break;
         case 'e': // switch off motors
