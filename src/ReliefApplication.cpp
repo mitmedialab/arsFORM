@@ -208,7 +208,8 @@ void ReliefApplication::draw(){
     // draw the frame buffers
     touchScreenDisplayImage.draw(0 , 0, w, h);
     
-    drawDebugScreen();
+    if (renderDebuggingInfo)
+        drawDebugScreen();
 
     
     // draw the projector image
@@ -343,6 +344,9 @@ void ReliefApplication::keyPressed(int key){
             motorsEnabled = !motorsEnabled;
             if (motorsEnabled) mIOManager->set_max_speed(maxSpeed);
             else mIOManager->set_max_speed(0);
+            break;
+        case 'r': // switch on and off motors
+            renderDebuggingInfo = !renderDebuggingInfo;
             break;
         case ' ': // switch between different math functions
             if(currentMode == "math" || currentMode == "mathScreenSaver") mathShapeObject->nextFunction();
