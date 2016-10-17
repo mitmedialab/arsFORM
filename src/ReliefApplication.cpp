@@ -180,9 +180,12 @@ void ReliefApplication::draw(){
         ofDisableAlphaBlending();
         ofPopStyle();
     }
+    else {
+        currentShape->renderTangibleShape(w, h);
+    }
     
-    overlayShape->renderTangibleShape(w, h);
-    currentShape->renderTangibleShape(w, h);
+    //overlayShape->renderTangibleShape(w, h);
+    //currentShape->renderTangibleShape(w, h);
     overlayShape->renderTangibleShape(w, h);
     
     ofPopMatrix();
@@ -321,7 +324,8 @@ void ReliefApplication::setMode(string newMode) {
         
         if (!ballMoverShapeObject->isBallInCorner())
             ballMoverShapeObject->moveBallToCorner();
-    } else if (currentMode == "mathScreenSaver") {
+    }
+    else if (currentMode == "mathScreenSaver") {
         mathShapeObject->reset();
         currentTransitionFromShape = currentShape;
         currentShape = mathShapeObject;
@@ -341,11 +345,9 @@ void ReliefApplication::keyPressed(int key){
         case 'q': // set mode to default telepresence with math screensaver
             setMode("telepresence");
             kinectTracker.resetTimeSinceLastActive();
-            //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
             break;
         case 'w': // set mode to fixed math (without switching back to telepresence)
             setMode("math");
-            //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
             break;
         case 'e': // switch off motors
             setMode("motorsoff");
