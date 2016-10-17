@@ -74,7 +74,6 @@ void ReliefApplication::setup(){
     wavyShapeObject->setKinectTracker(&kinectTracker);
     
     threeDShapeObject = new ThreeDShapeObject();
-    cityShapeObject = new CityShapeObject();
     
     mathShapeObject = new MathShapeObject();
     
@@ -82,16 +81,12 @@ void ReliefApplication::setup(){
     overlayShape = ballMoverShapeObject;
     
     transitionLengthMS = 500; // milliseconds of transition between shape objects
-   
     
     // set our current shape object to a default shape object
-    UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
+    //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
     
     // and default math equation
-    UITriggers::buttonTrigger(uiHandler->getButton("equationSelectButton1"));
-    
-    // and default city scape mode
-    UITriggers::buttonTrigger(uiHandler->getButton("citySelectButton1"));
+    //UITriggers::buttonTrigger(uiHandler->getButton("equationSelectButton1"));
     
     currentTransitionFromShape = currentShape;
     currentTransitionToShape = currentShape;
@@ -104,13 +99,12 @@ void ReliefApplication::update(){
     kinectTracker.update();
     
     // switch to mathematics mode if no activity is detected after x seconds on the depth camera
-    if (kinectTracker.timeSinceLastActive() > KINECT_ACTIVITY_TIMEOUT_SEC && currentMode != "math") {
+    if (kinectTracker.timeSinceLastActive() > KINECT_ACTIVITY_TIMEOUT_SEC && currentMode == "telepresence") {
         setMode("math");
-        
     }
     else if (kinectTracker.timeSinceLastActive() <= KINECT_ACTIVITY_TIMEOUT_SEC && currentMode == "math") {
         setMode("telepresence");
-        UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
+        //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
     }
     
     // update the necessary shape objects
@@ -118,8 +112,9 @@ void ReliefApplication::update(){
         currentTransitionFromShape->update();
         currentTransitionToShape->update();
     }
-    else
+    else {
         currentShape->update();
+    }
     
     overlayShape->update();
     
@@ -199,8 +194,6 @@ void ReliefApplication::draw(){
     ofPopStyle();
     
     
-    
-    
     // render the touch screen display into the frame buffer
     touchScreenDisplayImage.begin();
     
@@ -215,9 +208,10 @@ void ReliefApplication::draw(){
     
     // draw the frame buffers
     touchScreenDisplayImage.draw(0 , 0, w, h);
+    
+    drawDebugScreen();
 
-    
-    
+    /*
     // draw margin image
     if (currentMode == "3D") {
         currentShape->renderMarginGraphics(0, 460);
@@ -285,13 +279,10 @@ void ReliefApplication::draw(){
         uiHandler->getButton("modifyVal1Down")->setX(firstVarXOffsets[0].offsetX  + eqImageX);
         uiHandler->getButton("modifyVal2Up")->setX(secondVarXOffsets[0].offsetX   + eqImageX);
         uiHandler->getButton("modifyVal2Down")->setX(secondVarXOffsets[0].offsetX + eqImageX);
-    }
+    }*/
 
     // draw UI stuff
     //uiHandler->draw();
-    
-    
-    
     
     // draw the projector image
     
@@ -307,12 +298,10 @@ void ReliefApplication::draw(){
     if (currentMode == "telepresence") {
         projectorOverlayImage.draw(TOUCHSCREEN_SIZE_X + kinectRGBcamProjDims.x, kinectRGBcamProjDims.y,
                                    kinectRGBcamProjDims.width, kinectRGBcamProjDims.height);
-
     }
-    if (currentMode == "math") {
+    if (currentMode == "math" || currentMode == "idle" ) {
         projectorOverlayImage.draw(TOUCHSCREEN_SIZE_X + mathModeProjectionDims.x, mathModeProjectionDims.y,
                                    mathModeProjectionDims.width, mathModeProjectionDims.height);
-
     }
     
     //kinectTracker.drawActivityDepthImage(0, 0, 640, 480);
@@ -372,19 +361,12 @@ void ReliefApplication::setMode(string newMode) {
     if (newMode == currentMode)
         return;
 
-    if (newMode == "idle") {
-        UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
-        UITriggers::setIdle();
+    if (newMode == "idle" || newMode == "motorsoff") {
         currentMode = newMode;
-        backDisplayComputer->sendModeChange(newMode);
         
         currentTransitionFromShape = currentShape;
-        currentShape = kinectShapeObject;
         currentTransitionToShape = currentShape;
         transitionStart = ofGetElapsedTimeMillis();
-        
-        //if (ballMoverShapeObject->isBallInCorner())
-        //    ballMoverShapeObject->moveBallToCenter();
         
         mIOManager->set_max_speed(0);
         return;
@@ -394,7 +376,7 @@ void ReliefApplication::setMode(string newMode) {
     
     if (newMode == "telepresence" || newMode == "wavy" || newMode == "city" || newMode == "3D" || newMode == "math" || newMode == "idle") {
         currentMode = newMode;
-        backDisplayComputer->sendModeChange(newMode);
+        //backDisplayComputer->sendModeChange(newMode);
     }
     else
         cout << "Invalid mode selected" << endl;
@@ -430,17 +412,6 @@ void ReliefApplication::setMode(string newMode) {
         if (!ballMoverShapeObject->isBallInCorner())
             ballMoverShapeObject->moveBallToCorner();
     }
-    else if (currentMode == "city") {
-        cityShapeObject->reset();
-        //uiHandler->getSlider("sliderScale")->setHandlePos(0.5);
-        currentTransitionFromShape = currentShape;
-        currentShape = cityShapeObject;
-        currentTransitionToShape = currentShape;
-        transitionStart = ofGetElapsedTimeMillis();
-        
-        if (!ballMoverShapeObject->isBallInCorner())
-            ballMoverShapeObject->moveBallToCorner();
-    }
     else if (currentMode == "math") {
         mathShapeObject->reset();
         currentTransitionFromShape = currentShape;
@@ -458,29 +429,19 @@ void ReliefApplication::setMode(string newMode) {
 void ReliefApplication::keyPressed(int key){
     switch(key)
     {
-        case 'q':
+        case 'q': // set mode to telepresence with math screensaver
             setMode("telepresence");
-            UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
+            //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
             break;
-        case 'w':
-            setMode("wavy");
-            UITriggers::buttonTrigger(uiHandler->getButton("wavy"));
+        case 'w': // set mode to fixed math (without switching to telepresence)
+            setMode("fixedmath");
+            //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
             break;
-        case 'e':
-            setMode("city");
-            UITriggers::buttonTrigger(uiHandler->getButton("city"));
+        case 'e': // switch off motors
+            setMode("motorsoff");
+            //mIOManager->set_max_speed(0);
             break;
-        case 'r':
-            setMode("math");
-            UITriggers::buttonTrigger(uiHandler->getButton("math"));
-            break;
-        case 't':
-            setMode("idle");
-            break;
-        case 'y':
-            mIOManager->set_max_speed(0);
-            break;
-        case ' ':
+        case ' ': // switch between different math functions
             if(currentMode == "math") mathShapeObject->nextFunction();
             break;
         default:
@@ -504,20 +465,17 @@ void ReliefApplication::mouseMoved(int x, int y){
 void ReliefApplication::mouseDragged(int x, int y, int button){
     uiHandler->mouseDragged(x,y);
     if(currentMode == "3D") threeDShapeObject->setMouseDragInfo(x, y, button);
-    if(currentMode == "city") cityShapeObject->setMouseDragInfo(x, y, button);
 }
 
 //--------------------------------------------------------------
 void ReliefApplication::mousePressed(int x, int y, int button){
     uiHandler->mousePressed(x,y);
     if(currentMode == "3D") threeDShapeObject->setMousePressedInfo(x, y);
-    if(currentMode == "city") cityShapeObject->setMousePressedInfo(x, y);
 }
 
 //--------------------------------------------------------------
 void ReliefApplication::mouseReleased(int x, int y, int button){
     uiHandler->mouseReleased(x,y);
-    if(currentMode == "city") cityShapeObject->setMouseReleasedInfo();
 }
 
 //--------------------------------------------------------------
