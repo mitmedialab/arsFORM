@@ -23,7 +23,7 @@ void MathShapeObject::update() {
     function.update(dt);
     
     
-    // automatic switching between formulas
+    // automatic switching between formulas after certain time
     if ((ofGetElapsedTimeMillis() - lastFormelSwitchTime) / 1000 > MATH_FORMELSWITCH_SEC) {
         nextFunction();
         lastFormelSwitchTime = ofGetElapsedTimeMillis();
@@ -103,8 +103,6 @@ void MathShapeObject::update() {
 //--------------------------------------------------------------
 
 void MathShapeObject::renderProjectorOverlay(int w, int h) {
-    //projectorImage.draw(273, 178, 1639, 1254); //TODO find proper x y vals
-    //projectorImage.draw(510, 242, 3151, 1778);
     projectorImage.draw(0,0,w, h);
 }
 
@@ -167,8 +165,7 @@ void MathShapeObject::modifyVal2Down() {
 //--------------------------------------------------------------
 
 void MathShapeObject::reset() {
-//    function.setEqVal1(1);
-//    function.setEqVal2(1);
+    lastFormelSwitchTime = ofGetElapsedTimeMillis();
 }
 
 //--------------------------------------------------------------

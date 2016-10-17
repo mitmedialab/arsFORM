@@ -82,7 +82,7 @@ void ReliefApplication::setup(){
     
     transitionLengthMS = 500; // milliseconds of transition between shape objects
     
-    setMode("math");
+    setMode("mathScreenSaver");
     currentTransitionFromShape = currentShape;
     currentTransitionToShape = currentShape;
     
@@ -96,13 +96,12 @@ void ReliefApplication::update(){
     
     // switch to mathematics mode if no activity is detected after x seconds on the depth camera
     if (kinectTracker.timeSinceLastActive() > KINECT_ACTIVITY_TIMEOUT_SEC && currentMode == "telepresence") {
-        setMode("math");
+        setMode("mathScreenSaver");
     }
-    else if (currentMode == "math") {
+    else if (currentMode == "mathScreenSaver") {
         if(kinectTracker.timeSinceLastActive() <= KINECT_ACTIVITY_TIMEOUT_SEC) {
             setMode("telepresence");
         }
-        //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
     }
     
     // update the necessary shape objects
@@ -150,7 +149,6 @@ void ReliefApplication::draw(){
     currentShape->renderProjectorOverlay(w, h);
     projectorOverlayImage.end();
     
-    
     // render the tangible display
     ofPushStyle();
     
@@ -166,7 +164,7 @@ void ReliefApplication::draw(){
     long timeMS = ofGetElapsedTimeMillis();
     if (timeMS - transitionStart < transitionLengthMS) {
         
-        // draw semi transparent transitionImage
+        // draw semi transparent transition Image
         transitionImage.begin();
         ofBackground(0);
         currentTransitionFromShape->renderTangibleShape(w, h);
@@ -209,95 +207,21 @@ void ReliefApplication::draw(){
     
     drawDebugScreen();
 
-    /*
-    // draw margin image
-    if (currentMode == "3D") {
-        currentShape->renderMarginGraphics(0, 460);
-        uiHandler->getText("modelName")->setText(threeDShapeObject->getCurrentModelName());
-    }
-    if (currentMode == "math") {
-        //cout<<mathShapeObject->getEqVal1()<<endl;
-        //cout<<uiHandler->getNum("eqVal1")->getName() <<endl;
-        UIImage* equation = uiHandler->getImage("equation");
-        ofImage* eqImg = mathShapeObject->getEqImage();
-        
-        const int eqImageWidth = eqImg->getWidth();
-        const int eqImageX = TOUCHSCREEN_SIZE_X/2 - eqImageWidth/2;
-        const int eqNumY = equation->getY() + 60;
-        equation->setImage(eqImg);
-        equation->setX(eqImageX);
-        
-        vector<OffsetAndFont> firstVarXOffsets  = mathShapeObject->getVal1XOffsets();
-        vector<OffsetAndFont> secondVarXOffsets = mathShapeObject->getVal2XOffsets();
-        
-        UINum* eqVal1 = uiHandler->getNum("eqVal1");
-        UINum* eqVal2 = uiHandler->getNum("eqVal2");
-        
-        eqVal1->setX( firstVarXOffsets[0].offsetX + eqImageX);
-        eqVal2->setX(secondVarXOffsets[0].offsetX + eqImageX);
-        
-        eqVal1->setY( firstVarXOffsets[0].offsetY + eqNumY);
-        eqVal2->setY(secondVarXOffsets[0].offsetY + eqNumY);
-        
-        eqVal1->setSize( firstVarXOffsets[0].fontSizeOffset + 26);
-        eqVal2->setSize(secondVarXOffsets[0].fontSizeOffset + 26);
-        
-        eqVal1->setNum(mathShapeObject->getEqVal1());
-        eqVal2->setNum(mathShapeObject->getEqVal2());
-        
-        
-        UINum* eqValSec1 = uiHandler->getNum("eqValSecond1");
-        UINum* eqValSec2 = uiHandler->getNum("eqValSecond2");
-        
-        if (firstVarXOffsets.size() > 1 && secondVarXOffsets.size() > 1) {
-            eqValSec1->setX( firstVarXOffsets[1].offsetX + eqImageX);
-            eqValSec2->setX(secondVarXOffsets[1].offsetX + eqImageX);
-            
-            eqValSec1->setY( firstVarXOffsets[1].offsetY + eqNumY);
-            eqValSec2->setY(secondVarXOffsets[1].offsetY + eqNumY);
-            
-            eqValSec1->setSize( firstVarXOffsets[1].fontSizeOffset + 26);
-            eqValSec2->setSize(secondVarXOffsets[1].fontSizeOffset + 26);
-            
-            eqValSec1->setNum(mathShapeObject->getEqVal1());
-            eqValSec2->setNum(mathShapeObject->getEqVal2());
-            
-            if (eqVal1->showing()) {
-                eqValSec1->show();
-                eqValSec2->show();
-            }
-        }
-        else {
-            eqValSec1->hide();
-            eqValSec2->hide();
-        }
-            
-        
-        uiHandler->getButton("modifyVal1Up")->setX(firstVarXOffsets[0].offsetX    + eqImageX);
-        uiHandler->getButton("modifyVal1Down")->setX(firstVarXOffsets[0].offsetX  + eqImageX);
-        uiHandler->getButton("modifyVal2Up")->setX(secondVarXOffsets[0].offsetX   + eqImageX);
-        uiHandler->getButton("modifyVal2Down")->setX(secondVarXOffsets[0].offsetX + eqImageX);
-    }*/
-
-    // draw UI stuff
-    //uiHandler->draw();
     
     // draw the projector image
-    
-    w = projectorOverlayImage.getWidth();
-    h = projectorOverlayImage.getHeight();
+    //w = projectorOverlayImage.getWidth();
+    //h = projectorOverlayImage.getHeight();
     
     ofPushStyle();
     ofSetColor(0);
     ofRect(1920, 0, 1920, 1080);
     ofPopStyle();
-    //cameraTracker.drawCameraFeed(0, w, 0, w, h);
     
     if (currentMode == "telepresence") {
         projectorOverlayImage.draw(TOUCHSCREEN_SIZE_X + kinectRGBcamProjDims.x, kinectRGBcamProjDims.y,
                                    kinectRGBcamProjDims.width, kinectRGBcamProjDims.height);
     }
-    if (currentMode == "math" || currentMode == "idle" ) {
+    if (currentMode == "math" || currentMode == "mathScreenSaver" || currentMode == "motorsoff" ) {
         projectorOverlayImage.draw(TOUCHSCREEN_SIZE_X + mathModeProjectionDims.x, mathModeProjectionDims.y,
                                    mathModeProjectionDims.width, mathModeProjectionDims.height);
     }
@@ -359,7 +283,7 @@ void ReliefApplication::setMode(string newMode) {
     if (newMode == currentMode)
         return;
 
-    if (newMode == "idle" || newMode == "motorsoff") {
+    if (newMode == "motorsoff") {
         currentMode = newMode;
         
         currentTransitionFromShape = currentShape;
@@ -372,7 +296,7 @@ void ReliefApplication::setMode(string newMode) {
     
     mIOManager->set_max_speed(maxSpeed);
     
-    if (newMode == "telepresence" || newMode == "wavy" || newMode == "city" || newMode == "3D" || newMode == "math" || newMode == "idle") {
+    if (newMode == "telepresence" || newMode == "wavy" || newMode == "city" || newMode == "3D" || newMode == "math" || newMode == "mathScreenSaver") {
         currentMode = newMode;
         //backDisplayComputer->sendModeChange(newMode);
     }
@@ -388,29 +312,16 @@ void ReliefApplication::setMode(string newMode) {
         if (ballMoverShapeObject->isBallInCorner())
             ballMoverShapeObject->moveBallToCenter();
     }
-    else if (currentMode == "wavy") {
-        wavyShapeObject->reset();
+    else if (currentMode == "math") {
+        mathShapeObject->reset();
         currentTransitionFromShape = currentShape;
-        currentShape = wavyShapeObject;
-        currentTransitionToShape = currentShape;
-        transitionStart = ofGetElapsedTimeMillis();
-        
-        
-        if (ballMoverShapeObject->isBallInCorner())
-            ballMoverShapeObject->moveBallToCenter();
-    }
-    else if (currentMode == "3D") {
-        threeDShapeObject->reset();
-        uiHandler->getSlider("sliderScale")->setHandlePos(0.5);
-        currentTransitionFromShape = currentShape;
-        currentShape = threeDShapeObject;
+        currentShape = mathShapeObject;
         currentTransitionToShape = currentShape;
         transitionStart = ofGetElapsedTimeMillis();
         
         if (!ballMoverShapeObject->isBallInCorner())
             ballMoverShapeObject->moveBallToCorner();
-    }
-    else if (currentMode == "math") {
+    } else if (currentMode == "mathScreenSaver") {
         mathShapeObject->reset();
         currentTransitionFromShape = currentShape;
         currentShape = mathShapeObject;
@@ -427,12 +338,12 @@ void ReliefApplication::setMode(string newMode) {
 void ReliefApplication::keyPressed(int key){
     switch(key)
     {
-        case 'q': // set mode to telepresence with math screensaver
+        case 'q': // set mode to default telepresence with math screensaver
             setMode("telepresence");
             kinectTracker.resetTimeSinceLastActive();
             //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
             break;
-        case 'w': // set mode to fixed math (without switching to telepresence)
+        case 'w': // set mode to fixed math (without switching back to telepresence)
             setMode("math");
             //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
             break;
@@ -441,7 +352,7 @@ void ReliefApplication::keyPressed(int key){
             //mIOManager->set_max_speed(0);
             break;
         case ' ': // switch between different math functions
-            if(currentMode == "math") mathShapeObject->nextFunction();
+            if(currentMode == "math" || currentMode == "mathScreenSaver") mathShapeObject->nextFunction();
             break;
         default:
             changeCalibrationParams(key);
