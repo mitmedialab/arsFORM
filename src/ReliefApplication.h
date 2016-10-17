@@ -81,7 +81,7 @@ public:
     bool showInfo = true;
     
     bool motorsEnabled = true;
-    bool renderDebuggingInfo = true;
+    bool renderDebuggingInfo = false;
     
     void setup();
     void update();
