@@ -80,6 +80,8 @@ public:
     // whether or not we're on the info screen
     bool showInfo = true;
     
+    bool motorsEnabled = true;
+    
     void setup();
     void update();
     void draw();

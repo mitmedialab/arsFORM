@@ -80,7 +80,7 @@ void ReliefApplication::setup(){
     ballMoverShapeObject = new MoveBallShapeObject();
     overlayShape = ballMoverShapeObject;
     
-    transitionLengthMS = 500; // milliseconds of transition between shape objects
+    transitionLengthMS = 1000; // milliseconds of transition between shape objects
     
     setMode("mathScreenSaver");
     currentTransitionFromShape = currentShape;
@@ -224,7 +224,7 @@ void ReliefApplication::draw(){
         projectorOverlayImage.draw(TOUCHSCREEN_SIZE_X + kinectRGBcamProjDims.x, kinectRGBcamProjDims.y,
                                    kinectRGBcamProjDims.width, kinectRGBcamProjDims.height);
     }
-    if (currentMode == "math" || currentMode == "mathScreenSaver" || currentMode == "motorsoff" ) {
+    if (currentMode == "math" || currentMode == "mathScreenSaver" ) {
         projectorOverlayImage.draw(TOUCHSCREEN_SIZE_X + mathModeProjectionDims.x, mathModeProjectionDims.y,
                                    mathModeProjectionDims.width, mathModeProjectionDims.height);
     }
@@ -285,19 +285,9 @@ void ReliefApplication::drawDebugScreen() {
 void ReliefApplication::setMode(string newMode) {
     if (newMode == currentMode)
         return;
-
-    if (newMode == "motorsoff") {
-        currentMode = newMode;
-        
-        currentTransitionFromShape = currentShape;
-        currentTransitionToShape = currentShape;
-        transitionStart = ofGetElapsedTimeMillis();
-        
-        mIOManager->set_max_speed(0);
-        return;
-    }
     
-    mIOManager->set_max_speed(maxSpeed);
+    if(motorsEnabled)
+        mIOManager->set_max_speed(maxSpeed);
     
     if (newMode == "telepresence" || newMode == "wavy" || newMode == "city" || newMode == "3D" || newMode == "math" || newMode == "mathScreenSaver") {
         currentMode = newMode;
@@ -343,15 +333,17 @@ void ReliefApplication::keyPressed(int key){
     switch(key)
     {
         case 'q': // set mode to default telepresence with math screensaver
+            motorsEnabled = true;
             setMode("telepresence");
             kinectTracker.resetTimeSinceLastActive();
             break;
         case 'w': // set mode to fixed math (without switching back to telepresence)
+            motorsEnabled = true;
             setMode("math");
             break;
         case 'e': // switch off motors
-            setMode("motorsoff");
-            //mIOManager->set_max_speed(0);
+            motorsEnabled = false;
+            mIOManager->set_max_speed(0);
             break;
         case ' ': // switch between different math functions
             if(currentMode == "math" || currentMode == "mathScreenSaver") mathShapeObject->nextFunction();
