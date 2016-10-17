@@ -88,8 +88,10 @@ void ReliefApplication::setup(){
     // and default math equation
     //UITriggers::buttonTrigger(uiHandler->getButton("equationSelectButton1"));
     
+    setMode("math");
     currentTransitionFromShape = currentShape;
     currentTransitionToShape = currentShape;
+    
 }
 
 //--------------------------------------------------------------
