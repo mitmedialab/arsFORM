@@ -12,6 +12,7 @@ MathShapeObject::MathShapeObject() {
     touchscreenImage.allocate(TOUCHSCREEN_SIZE_Y, TOUCHSCREEN_SIZE_Y, GL_RGBA);
     pinHeightMapImage.allocate(TOUCHSCREEN_SIZE_Y, TOUCHSCREEN_SIZE_Y, GL_RGBA);
     projectorImage.allocate(PROJECTOR_RAW_RESOLUTION_X, PROJECTOR_RAW_RESOLUTION_Y, GL_RGBA);
+    lastFormelSwitchTime = ofGetElapsedTimeMillis();
 }
 
 //--------------------------------------------------------------
@@ -20,6 +21,13 @@ void MathShapeObject::update() {
     
     float dt = 1.0f / ofGetFrameRate();
     function.update(dt);
+    
+    
+    // automatic switching between formulas
+    if ((ofGetElapsedTimeMillis() - lastFormelSwitchTime) / 1000 > MATH_FORMELSWITCH_SEC) {
+        nextFunction();
+        lastFormelSwitchTime = ofGetElapsedTimeMillis();
+    }
     
     //draw in FBOs
     pinHeightMapImage.begin();

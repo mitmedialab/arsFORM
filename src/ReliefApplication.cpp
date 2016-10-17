@@ -429,6 +429,7 @@ void ReliefApplication::keyPressed(int key){
     {
         case 'q': // set mode to telepresence with math screensaver
             setMode("telepresence");
+            kinectTracker->resetTimeSinceLastActive();
             //UITriggers::buttonTrigger(uiHandler->getButton("telepresence"));
             break;
         case 'w': // set mode to fixed math (without switching to telepresence)

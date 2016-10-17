@@ -367,3 +367,7 @@ void KinectTracker::setCrop(int x, int y, int width, int height) {
 double KinectTracker::timeSinceLastActive() {
     return (ofGetElapsedTimeMillis() - lastActiveTime) / 1000.0;
 }
+
+void KinectTracker::resetTimeSinceLastActive() {
+    lastActiveTime = ofGetElapsedTimeMillis();
+}

@@ -106,6 +106,7 @@ public:
     // in seconds
     long lastActiveTime = 0;
     double timeSinceLastActive();
+    void resetTimeSinceLastActive();
 };
 
 
