@@ -333,17 +333,16 @@ void ReliefApplication::keyPressed(int key){
     switch(key)
     {
         case 'q': // set mode to default telepresence with math screensaver
-            motorsEnabled = true;
             setMode("telepresence");
             kinectTracker.resetTimeSinceLastActive();
             break;
         case 'w': // set mode to fixed math (without switching back to telepresence)
-            motorsEnabled = true;
             setMode("math");
             break;
-        case 'e': // switch off motors
-            motorsEnabled = false;
-            mIOManager->set_max_speed(0);
+        case 'e': // switch on and off motors
+            motorsEnabled = !motorsEnabled;
+            if (motorsEnabled) mIOManager->set_max_speed(maxSpeed);
+            else mIOManager->set_max_speed(0);
             break;
         case ' ': // switch between different math functions
             if(currentMode == "math" || currentMode == "mathScreenSaver") mathShapeObject->nextFunction();
