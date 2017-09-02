@@ -123,7 +123,15 @@ void ReliefApplication::update(){
     ofSetColor(255);
     
     ofPushMatrix();
-        pinHeightMapImage.draw(0, 0, RELIEF_PHYSICAL_SIZE_X, RELIEF_PHYSICAL_SIZE_Y);
+        if (currentMode == "debug") {
+            ofPushStyle();
+            ofSetColor(debugPinHeight);
+            ofRect(0, 0, RELIEF_PHYSICAL_SIZE_X, RELIEF_PHYSICAL_SIZE_Y);
+            ofPopStyle();
+        }
+        else {
+            pinHeightMapImage.draw(0, 0, RELIEF_PHYSICAL_SIZE_X, RELIEF_PHYSICAL_SIZE_Y);
+        }
     ofPopMatrix();
     
     pinHeightMapImageSmall.end();
@@ -212,10 +220,6 @@ void ReliefApplication::draw(){
         drawDebugScreen();
 
     
-    // draw the projector image
-    //w = projectorOverlayImage.getWidth();
-    //h = projectorOverlayImage.getHeight();
-    
     ofPushStyle();
     ofSetColor(0);
     ofRect(1920, 0, 1920, 1080);
@@ -229,9 +233,6 @@ void ReliefApplication::draw(){
         projectorOverlayImage.draw(TOUCHSCREEN_SIZE_X + mathModeProjectionDims.x, mathModeProjectionDims.y,
                                    mathModeProjectionDims.width, mathModeProjectionDims.height);
     }
-    
-    //kinectTracker.drawActivityDepthImage(0, 0, 640, 480);
-    //drawDebugScreen();
 }
 
 //--------------------------------------------------------------
@@ -290,7 +291,10 @@ void ReliefApplication::setMode(string newMode) {
     if(motorsEnabled)
         mIOManager->set_max_speed(maxSpeed);
     
-    if (newMode == "telepresence" || newMode == "wavy" || newMode == "city" || newMode == "3D" || newMode == "math" || newMode == "mathScreenSaver") {
+    if (newMode == "telepresence" || newMode == "wavy"
+        || newMode == "city" || newMode == "3D"
+        || newMode == "math" || newMode == "mathScreenSaver"
+        || newMode == "debug") {
         currentMode = newMode;
         //backDisplayComputer->sendModeChange(newMode);
     }
@@ -326,6 +330,9 @@ void ReliefApplication::setMode(string newMode) {
         if (!ballMoverShapeObject->isBallInCorner())
             ballMoverShapeObject->moveBallToCorner();
     }
+    else if (currentMode == "debug") {
+        // mIOManager->resetPinsToValue(0);
+    }
 
 }
 
@@ -345,11 +352,20 @@ void ReliefApplication::keyPressed(int key){
             if (motorsEnabled) mIOManager->set_max_speed(maxSpeed);
             else mIOManager->set_max_speed(0);
             break;
+        case 'd':
+            setMode("debug");
+            break;
         case 'r': // switch on and off motors
             renderDebuggingInfo = !renderDebuggingInfo;
             break;
         case ' ': // switch between different math functions
             if(currentMode == "math" || currentMode == "mathScreenSaver") mathShapeObject->nextFunction();
+            break;
+        case OF_KEY_UP: // switch between different math functions
+            if(currentMode == "debug") debugPinHeight = 239;
+            break;
+        case OF_KEY_DOWN: // switch between different math functions
+            if(currentMode == "debug") debugPinHeight = 16;
             break;
         default:
             changeCalibrationParams(key);

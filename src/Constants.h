@@ -17,6 +17,8 @@
 #define	RELIEF_SIZE_Y	  24
 
 // clips values
+
+//#define LOW_THRESHOLD 12 // don't set too low, or the pins will bang into the table
 #define LOW_THRESHOLD 57 // don't set too low, or the pins will bang into the table
 #define HIGH_THRESHOLD 244 // don't set above 245, as that is the address range!
 

@@ -32,6 +32,7 @@ public:
     int              max_I;
     int              deadZone;
     int              maxSpeed;
+    int              debugPinHeight = 100;
     
     //  camera calibration variables:
     ofRectangle kinectDepthcamCropDims;
